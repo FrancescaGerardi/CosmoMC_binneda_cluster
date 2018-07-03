@@ -119,6 +119,7 @@
 
 !-------------------------------------------------------------------
 
+
     real(mcp) function w_LnLike(this, CMB, DataParams)
     Class(wLikelihood) :: this
     Class(CMBParams) CMB
@@ -126,7 +127,7 @@
 
     integer :: i,j,d
     real :: chi2
-    real(dl), dimension(:), allocatable          :: diff_vec, wfid, wi, gpreds
+    real(dl), dimension(:), allocatable          :: diff_vec, wfid, wi, gpa
     real(dl), dimension(:,:), allocatable        :: covmat, inv_covmat
     real(dl), dimension(:), allocatable        :: autocorr
     real(dl)                                     :: distance, autodist
@@ -136,30 +137,30 @@
 
     if(CMB%mode.ne.3) then
         d=CMB%numbins
-        allocate (diff_vec(d), wfid(d), wi(d), gpreds(d))
+        allocate (diff_vec(d), wfid(d), wi(d), gpa(d))
         allocate (covmat(d,d),inv_covmat(d,d),autocorr(d))
         do i=1,CMB%numbins
            wi(i)=CMB%binw(i)
         end do
-        gpreds(1) = (-1+1._dl/CMB%bina(1))/2.
-        do i=2, CMB%numbins
-           gpreds(i) = ((-1+1._dl/CMB%bina(i))+(-1+1._dl/CMB%bina(i-1)))/2.
-        end do
+        gpa(1) = (1._dl + CMB%bina(1))/2
+         do i=2,CMB%numbins
+            gpa(i) = (CMB%bina(i-1)+CMB%bina(i))/2.
+         end do
     else
         d=CMB%numbins+1
-        allocate (diff_vec(d), wfid(d), wi(d), gpreds(d))
+        allocate (diff_vec(d), wfid(d), wi(d), gpa(d))
         allocate (covmat(d,d),inv_covmat(d,d),autocorr(d))
         wi(1)=CMB%binw0
         do i=1,CMB%numbins
            wi(i+1)=CMB%binw(i)
         end do
-        gpreds(1) = 0
-        do i=1, CMB%numbins
-           gpreds(i+1) = ((-1+1._dl/CMB%bina(i))+(-1+1._dl/CMB%bina(i-1)))/2.
-        end do
+        gpa(1)=1._dl
+         do i=1,CMB%numbins
+            gpa(i+1) = (CMB%bina(i-1)+CMB%bina(i))/2.
+         end do
     end if
 
-    if (debugging) write(*,*) 'il vettore dei redshift e', gpreds
+    if (debugging) write(*,*) 'il vettore scale factors e', gpa
     if (debugging) write(*,*) 'la dimensione dei vettori e', d
     if (debugging) write(*,*) 'il vettore v_w', wi
     
@@ -183,10 +184,10 @@
     !COMPUTING AUTOCORRELATION
     do i=1,d
        if (this%modelclass.eq.quintessence) then
-          autodist = -1._dl+(1._dl/(1+gpreds(i)))
+          autodist = gpa(i)
           if (debugging) write(*,*) 'quintessence autodistance', autodist
        else if ((this%modelclass.eq.GBD).or.(this%modelclass.eq.horndeski)) then
-          autodist = log(1._dl/(1+gpreds(i)))
+          autodist = log(gpa(i))
           if (debugging) write(*,*) 'horndeski autodistance', autodist
        else
           write(*,*) 'MODEL CHOICE 1-3'
@@ -203,10 +204,10 @@
        do i=1,d
           do j=1,d
              if (this%modelclass.eq.quintessence) then
-                distance = abs((1./(1+gpreds(i)))-(1./(1+gpreds(j))))
+                distance = abs(gpa(i)-gpa(j))
                 if (debugging) write(*,*) 'quintessence distance', distance
              else if ((this%modelclass.eq.GBD).or.(this%modelclass.eq.horndeski)) then
-                distance = abs(log(1./(1+gpreds(i)))-log(1./(1+gpreds(j))))
+                distance = abs(log(gpa(i))-log(gpa(j)))
                 if (debugging) write(*,*) 'horndeski distance', distance
              else
                 write(*,*) 'MODEL CHOICE 1-3'
@@ -246,14 +247,8 @@
     !COMPUTING CHI2
     chi2 = 0._dl
 
-!    chi2 = dot_product( diff_vec, MatMul(inv_covmat,diff_vec))
+    chi2 = dot_product( diff_vec, MatMul(inv_covmat,diff_vec))
 
-	do i=1,d
-		do j=1,d
-                        if (debugging) write(*,*) 'elemento', i, j, 'del chi2', diff_vec(i)*inv_covmat(i,j)*diff_vec(j)
-			chi2 = chi2 + diff_vec(i)*inv_covmat(i,j)*diff_vec(j)
-		end do
-	end do
 
 !    if (debugging) then
 !       open(78, file='chi2_priorwde.dat', status='unknown', position='append')
