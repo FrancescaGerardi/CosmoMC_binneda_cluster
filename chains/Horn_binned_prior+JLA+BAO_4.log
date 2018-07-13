@@ -1,0 +1,18 @@
+CAMB called 100 times; 0 errors
+CAMB called 200 times; 0 errors
+CAMB called 300 times; 0 errors
+ Current convergence R-1 =    48.59889      chain steps =         385
+ slow changes         384  power changes           0
+CAMB called 400 times; 0 errors
+CAMB called 500 times; 0 errors
+CAMB called 600 times; 0 errors
+CAMB called 700 times; 0 errors
+ Current convergence R-1 =    9.079449      chain steps =         734
+ slow changes         731  power changes           0
+CAMB called 800 times; 0 errors
+CAMB called 900 times; 0 errors
+CAMB called 1000 times; 0 errors
+ Current convergence R-1 =    2.239353      chain steps =        1087
+ slow changes        1068  power changes           0
+CAMB called 1100 times; 0 errors
+CAMB called 1200 times; 0 errors

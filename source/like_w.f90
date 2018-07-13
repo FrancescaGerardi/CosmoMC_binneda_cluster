@@ -8,7 +8,7 @@
     implicit none
     private
 
-    logical :: debugging=.true.
+    logical :: debugging=.false.
     logical :: debugging_paramsprior=.false.
 
     !likelihood variables
@@ -155,7 +155,8 @@
            wi(i+1)=CMB%binw(i)
         end do
         gpa(1)=1._dl
-         do i=1,CMB%numbins
+        gpa(2) = (1._dl + CMB%bina(1))/2
+         do i=2,CMB%numbins
             gpa(i+1) = (CMB%bina(i-1)+CMB%bina(i))/2.
          end do
     end if
@@ -166,11 +167,11 @@
     
     
     !COMPUTING MEAN OF W_I VALUES-----------
-    wfid(1) = (wi(1)+wi(2)+(-1))/3
+    wfid(1) = (wi(1)+wi(2))/2
     do i=2,d
        wfid(i)=(wi(i-1)+wi(i)+wi(i+1))/3
     end do
-    wfid(d)= (wi(d-1)+wi(d))/2
+    wfid(d)= (wi(d-1)+wi(d)*2)/3
     if (debugging) write(*,*) 'il vettore v_wfid', wfid
 
 

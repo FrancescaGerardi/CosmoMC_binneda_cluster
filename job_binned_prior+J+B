@@ -1,0 +1,17 @@
+#!/bin/env bash
+##comment out lines by adding at least two `#' at the beginning
+#SBATCH --job-name=H4g_b
+#SBATCH --account=silvestri
+#SBATCH --partition=computation
+#SBATCH --output=/marisdata/gerardi/input_a/Horndeski/CosmoMC_binneda_4_GP/%x.out
+#SBATCH --error=/marisdata/gerardi/input_a/Horndeski/CosmoMC_binneda_4_GP/%x.err
+#SBATCH --time=100-00:00:00
+#SBATCH --mem=10000
+#SBATCH --ntasks=8
+# mail alert at start, end and abortion of execution
+#SBATCH --mail-type=FAIL
+# send mail to this address
+#SBATCH --mail-user=francesca.gerardi@hotmail.it
+
+
+mpirun -verbose -np 8 ./cosmomc params_binned_prior+JLA+BAO.ini > chains/chain_Horn_binned_prior+JLA+BAO.log
